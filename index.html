@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIG SATINFORMATIKA</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--card:#142033;--line:#29374b;--text:#edf3fb;--muted:#9caec5;--accent:#37d4b0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,sans-serif}
+header{padding:28px 5%;border-bottom:1px solid var(--line);background:#101c2e}
+h1{margin:5px 0;font-size:25px;letter-spacing:1px}
+h2{font-size:19px;margin-top:0}
+p{color:var(--muted);line-height:1.6}
+.tag{color:var(--accent);font-size:12px;letter-spacing:2px}
+main{max-width:1200px;margin:auto;padding:24px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.card,section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card small{color:var(--muted)}
+.card strong{display:block;font-size:27px;margin-top:10px}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:20px}
+label{display:block;margin:14px 0 6px;color:var(--muted);font-size:13px}
+input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--text);font:inherit}
+textarea{min-height:95px;resize:vertical}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{padding:12px 16px;border:0;border-radius:9px;background:var(--accent);color:#05251e;font-weight:700;cursor:pointer}
+.primary{width:100%;margin-top:20px}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.secondary{background:#27394f;color:white}
+.item{padding:17px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.item:last-child{border:0}
+.item h3{margin:8px 0;font-size:16px}
+.badge{background:#253c4b;color:#8aecd5;padding:4px 9px;border-radius:6px;font-size:12px}
+a{color:#72c8ff}
+.metrics{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:12px 0}
+.caption{white-space:pre-wrap}
+.delete{background:#422b38;color:#ffc0c9;padding:7px 12px}
+.notice{background:#172f40;padding:12px;border-radius:9px;color:#bbd8eb;font-size:13px}
+#message{color:var(--accent)}
+footer{padding:25px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}main{padding:15px}}
+@media print{
+:root{color-scheme:light}
+body,header,section,.card{background:white!important;color:black!important}
+p,.metrics,.card small,footer{color:#444!important}
+.entry,.tools,.delete,.notice,#message{display:none!important}
+.layout{display:block}
+.cards{grid-template-columns:repeat(4,1fr)}
+section,.card{border:1px solid #ccc}
+.item{break-inside:avoid;border-color:#ccc}
+a{color:#222}
+}
+</style>
+</head>
+<body>
+<header>
+<span class="tag">SOCIAL MEDIA MONITORING</span>
+<h1>SIG SATINFORMATIKA</h1>
+<p>Penilaian URL · Rekap monitoring · Laporan</p>
+<div id="clock"></div>
+</header>
+<main>
+<div class="cards">
+<div class="card"><small>Unggahan tersimpan</small><strong id="total">0</strong></div>
+<div class="card"><small>Views diketahui</small><strong id="views">—</strong></div>
+<div class="card"><small>Interaksi teramati</small><strong id="interactions">—</strong></div>
+<div class="card"><small>Dicatat hari ini · WIB</small><strong id="today">0</strong></div>
+</div>
+<div class="layout">
+<section class="entry">
+<h2>Masukkan unggahan</h2>
+<div class="notice">Input manual. URL saja belum mengambil isi dan statistik otomatis. Kosongkan angka yang belum diketahui.</div>
+<form id="form">
+<label>URL unggahan</label>
+<input id="url" type="url" placeholder="https://..." required>
+<label>Nama akun</label>
+<input id="account" placeholder="@namaakun">
+<label>Isi unggahan / caption</label>
+<textarea id="caption" placeholder="Tempel isi unggahan"></textarea>
+<div class="pair">
+<div><label>Views</label><input id="v" type="number" min="0" step="1"></div>
+<div><label>Likes</label><input id="l" type="number" min="0" step="1"></div>
+<div><label>Komentar</label><input id="c" type="number" min="0" step="1"></div>
+<div><label>Shares</label><input id="s" type="number" min="0" step="1"></div>
+</div>
+<label>Sentimen · penilaian pengguna</label>
+<select id="sentiment">
+<option>Belum dinilai</option><option>Positif</option>
+<option>Netral</option><option>Negatif</option><option>Campuran</option>
+</select>
+<label>Objek sentimen / topik</label>
+<input id="topic" placeholder="Objek yang sedang dinilai">
+<label>Catatan analis</label>
+<textarea id="note" placeholder="Temuan dan alasan penilaian"></textarea>
+<button class="primary">Simpan & hitung</button>
+<p id="message" role="status"></p>
+</form>
+</section>
+<section>
+<div class="tools">
+<h2 style="margin:0;flex:1">Rekap unggahan</h2>
+<button class="secondary" id="export">Ekspor cadangan</button>
+<button id="print">Cetak / PDF</button>
+</div>
+<p>Angka bersumber dari input pengguna. Total views bukan jumlah orang unik. Engagement dihitung jika views, likes, komentar, dan shares lengkap.</p>
+<div id="list"></div>
+</section>
+</div>
+</main>
+<footer>Data tersimpan di browser perangkat ini. Ekspor cadangan secara berkala.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const key="sig-url-monitor-v1";
+let rows=[];
+try{
+const saved=JSON.parse(localStorage.getItem(key)||"[]");
+if(Array.isArray(saved)) rows=saved;
+}catch(e){$("message").textContent="Data tersimpan tidak dapat dibaca."}
+const fmt=n=>Number(n).toLocaleString("id-ID");
+const day=t=>new Intl.DateTimeFormat("en-CA",{
+timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"
+}).format(new Date(t));
+function platform(host){
+host=host.toLowerCase().replace(/^www\./,"");
+const match=d=>host===d||host.endsWith("."+d);
+if(match("instagram.com"))return "Instagram";
+if(match("tiktok.com"))return "TikTok";
+if(match("facebook.com")||match("fb.watch"))return "Facebook";
+if(match("x.com")||match("twitter.com"))return "X";
+return null;
+}
+function persist(next){
+try{
+localStorage.setItem(key,JSON.stringify(next));
+rows=next;render();return true;
+}catch(e){
+$("message").textContent="Gagal menyimpan. Penyimpanan browser mungkin penuh atau dibatasi.";
+return false;
+}
+}
+function text(parent,tag,value,cls){
+const el=document.createElement(tag);
+el.textContent=value;if(cls)el.className=cls;
+parent.appendChild(el);return el;
+}
+function render(){
+$("total").textContent=fmt(rows.length);
+const knownViews=rows.filter(r=>r.v!==null);
+$("views").textContent=knownViews.length?
+fmt(knownViews.reduce((a,r)=>a+r.v,0)):"—";
+const known=rows.flatMap(r=>[r.l,r.c,r.s]).filter(n=>n!==null);
+$("interactions").textContent=known.length?fmt(known.reduce((a,b)=>a+b,0)):"—";
+$("today").textContent=fmt(rows.filter(r=>day(r.time)===day(Date.now())).length);
+$("list").replaceChildren();
+if(!rows.length)text($("list"),"p","Belum ada unggahan. Masukkan URL melalui formulir.");
+rows.slice().reverse().forEach(r=>{
+const item=document.createElement("article");item.className="item";
+text(item,"span",r.platform+" · "+r.sentiment,"badge");
+text(item,"h3",r.account||"Akun belum diisi");
+const link=text(item,"a",r.url);
+link.href=r.url;link.target="_blank";link.rel="noopener noreferrer";
+if(r.caption)text(item,"p",r.caption,"caption");
+const m=document.createElement("div");m.className="metrics";
+[["Views",r.v],["Likes",r.l],["Komentar",r.c],["Shares",r.s]].forEach(([k,v])=>{
+text(m,"span",k+": "+(v===null?"Belum tersedia":fmt(v)));
+});
+item.appendChild(m);
+const complete=[r.l,r.c,r.s].every(n=>n!==null);
+text(item,"p","Engagement / views: "+(
+complete&&r.v>0?((r.l+r.c+r.s)/r.v*100).toFixed(2)+"%":"Data belum mencukupi"
+));
+if(r.topic)text(item,"p","Objek / topik: "+r.topic);
+if(r.note)text(item,"p","Catatan: "+r.note,"caption");
+text(item,"p","Dicatat: "+new Date(r.time).toLocaleString("id-ID",{timeZone:"Asia/Jakarta"})+" WIB · Sumber: input manual");
+const del=text(item,"button","Hapus","delete");
+del.onclick=()=>{if(confirm("Hapus unggahan ini?"))persist(rows.filter(x=>x.id!==r.id))};
+$("list").appendChild(item);
+});
+}
+$("form").onsubmit=e=>{
+e.preventDefault();
+const u=new URL($("url").value.trim());
+const p=platform(u.hostname);
+if(!p||u.protocol!=="https:"){
+$("message").textContent="Gunakan URL HTTPS dari TikTok, Instagram, Facebook, atau X.";return;
+}
+u.hash="";
+const duplicate=rows.some(r=>r.url===u.href);
+if(duplicate){$("message").textContent="URL yang sama sudah tersimpan.";return}
+const number=id=>$(id).value===""?null:Number($(id).value);
+const row={
+id:crypto.randomUUID(),url
