@@ -1,192 +1,38 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SIG SATINFORMATIKA</title>
-<style>
-:root{color-scheme:dark;--bg:#0b1220;--card:#142033;--line:#29374b;--text:#edf3fb;--muted:#9caec5;--accent:#37d4b0}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,sans-serif}
-header{padding:28px 5%;border-bottom:1px solid var(--line);background:#101c2e}
-h1{margin:5px 0;font-size:25px;letter-spacing:1px}
-h2{font-size:19px;margin-top:0}
-p{color:var(--muted);line-height:1.6}
-.tag{color:var(--accent);font-size:12px;letter-spacing:2px}
-main{max-width:1200px;margin:auto;padding:24px}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
-.card,section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
-.card small{color:var(--muted)}
-.card strong{display:block;font-size:27px;margin-top:10px}
-.layout{display:grid;grid-template-columns:360px 1fr;gap:20px}
-label{display:block;margin:14px 0 6px;color:var(--muted);font-size:13px}
-input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--text);font:inherit}
-textarea{min-height:95px;resize:vertical}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{padding:12px 16px;border:0;border-radius:9px;background:var(--accent);color:#05251e;font-weight:700;cursor:pointer}
-.primary{width:100%;margin-top:20px}
-.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-.secondary{background:#27394f;color:white}
-.item{padding:17px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
-.item:last-child{border:0}
-.item h3{margin:8px 0;font-size:16px}
-.badge{background:#253c4b;color:#8aecd5;padding:4px 9px;border-radius:6px;font-size:12px}
-a{color:#72c8ff}
-.metrics{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:12px 0}
-.caption{white-space:pre-wrap}
-.delete{background:#422b38;color:#ffc0c9;padding:7px 12px}
-.notice{background:#172f40;padding:12px;border-radius:9px;color:#bbd8eb;font-size:13px}
-#message{color:var(--accent)}
-footer{padding:25px;text-align:center;color:var(--muted);font-size:12px}
-@media(max-width:800px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}main{padding:15px}}
-@media print{
-:root{color-scheme:light}
-body,header,section,.card{background:white!important;color:black!important}
-p,.metrics,.card small,footer{color:#444!important}
-.entry,.tools,.delete,.notice,#message{display:none!important}
-.layout{display:block}
-.cards{grid-template-columns:repeat(4,1fr)}
-section,.card{border:1px solid #ccc}
-.item{break-inside:avoid;border-color:#ccc}
-a{color:#222}
-}
-</style>
-</head>
-<body>
-<header>
-<span class="tag">SOCIAL MEDIA MONITORING</span>
-<h1>SIG SATINFORMATIKA</h1>
-<p>Penilaian URL · Rekap monitoring · Laporan</p>
-<div id="clock"></div>
-</header>
-<main>
-<div class="cards">
-<div class="card"><small>Unggahan tersimpan</small><strong id="total">0</strong></div>
-<div class="card"><small>Views diketahui</small><strong id="views">—</strong></div>
-<div class="card"><small>Interaksi teramati</small><strong id="interactions">—</strong></div>
-<div class="card"><small>Dicatat hari ini · WIB</small><strong id="today">0</strong></div>
-</div>
-<div class="layout">
-<section class="entry">
-<h2>Masukkan unggahan</h2>
-<div class="notice">Input manual. URL saja belum mengambil isi dan statistik otomatis. Kosongkan angka yang belum diketahui.</div>
-<form id="form">
-<label>URL unggahan</label>
-<input id="url" type="url" placeholder="https://..." required>
-<label>Nama akun</label>
-<input id="account" placeholder="@namaakun">
-<label>Isi unggahan / caption</label>
-<textarea id="caption" placeholder="Tempel isi unggahan"></textarea>
-<div class="pair">
-<div><label>Views</label><input id="v" type="number" min="0" step="1"></div>
-<div><label>Likes</label><input id="l" type="number" min="0" step="1"></div>
-<div><label>Komentar</label><input id="c" type="number" min="0" step="1"></div>
-<div><label>Shares</label><input id="s" type="number" min="0" step="1"></div>
-</div>
-<label>Sentimen · penilaian pengguna</label>
-<select id="sentiment">
-<option>Belum dinilai</option><option>Positif</option>
-<option>Netral</option><option>Negatif</option><option>Campuran</option>
-</select>
-<label>Objek sentimen / topik</label>
-<input id="topic" placeholder="Objek yang sedang dinilai">
-<label>Catatan analis</label>
-<textarea id="note" placeholder="Temuan dan alasan penilaian"></textarea>
-<button class="primary">Simpan & hitung</button>
-<p id="message" role="status"></p>
-</form>
-</section>
-<section>
-<div class="tools">
-<h2 style="margin:0;flex:1">Rekap unggahan</h2>
-<button class="secondary" id="export">Ekspor cadangan</button>
-<button id="print">Cetak / PDF</button>
-</div>
-<p>Angka bersumber dari input pengguna. Total views bukan jumlah orang unik. Engagement dihitung jika views, likes, komentar, dan shares lengkap.</p>
-<div id="list"></div>
-</section>
-</div>
-</main>
-<footer>Data tersimpan di browser perangkat ini. Ekspor cadangan secara berkala.</footer>
-<script>
-const $=id=>document.getElementById(id);
-const key="sig-url-monitor-v1";
-let rows=[];
-try{
-const saved=JSON.parse(localStorage.getItem(key)||"[]");
-if(Array.isArray(saved)) rows=saved;
-}catch(e){$("message").textContent="Data tersimpan tidak dapat dibaca."}
-const fmt=n=>Number(n).toLocaleString("id-ID");
-const day=t=>new Intl.DateTimeFormat("en-CA",{
-timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"
-}).format(new Date(t));
-function platform(host){
-host=host.toLowerCase().replace(/^www\./,"");
-const match=d=>host===d||host.endsWith("."+d);
-if(match("instagram.com"))return "Instagram";
-if(match("tiktok.com"))return "TikTok";
-if(match("facebook.com")||match("fb.watch"))return "Facebook";
-if(match("x.com")||match("twitter.com"))return "X";
-return null;
-}
-function persist(next){
-try{
-localStorage.setItem(key,JSON.stringify(next));
-rows=next;render();return true;
-}catch(e){
-$("message").textContent="Gagal menyimpan. Penyimpanan browser mungkin penuh atau dibatasi.";
-return false;
-}
-}
-function text(parent,tag,value,cls){
-const el=document.createElement(tag);
-el.textContent=value;if(cls)el.className=cls;
-parent.appendChild(el);return el;
-}
-function render(){
-$("total").textContent=fmt(rows.length);
-const knownViews=rows.filter(r=>r.v!==null);
-$("views").textContent=knownViews.length?
-fmt(knownViews.reduce((a,r)=>a+r.v,0)):"—";
-const known=rows.flatMap(r=>[r.l,r.c,r.s]).filter(n=>n!==null);
-$("interactions").textContent=known.length?fmt(known.reduce((a,b)=>a+b,0)):"—";
-$("today").textContent=fmt(rows.filter(r=>day(r.time)===day(Date.now())).length);
-$("list").replaceChildren();
-if(!rows.length)text($("list"),"p","Belum ada unggahan. Masukkan URL melalui formulir.");
-rows.slice().reverse().forEach(r=>{
-const item=document.createElement("article");item.className="item";
-text(item,"span",r.platform+" · "+r.sentiment,"badge");
-text(item,"h3",r.account||"Akun belum diisi");
-const link=text(item,"a",r.url);
-link.href=r.url;link.target="_blank";link.rel="noopener noreferrer";
-if(r.caption)text(item,"p",r.caption,"caption");
-const m=document.createElement("div");m.className="metrics";
-[["Views",r.v],["Likes",r.l],["Komentar",r.c],["Shares",r.s]].forEach(([k,v])=>{
-text(m,"span",k+": "+(v===null?"Belum tersedia":fmt(v)));
-});
-item.appendChild(m);
-const complete=[r.l,r.c,r.s].every(n=>n!==null);
-text(item,"p","Engagement / views: "+(
-complete&&r.v>0?((r.l+r.c+r.s)/r.v*100).toFixed(2)+"%":"Data belum mencukupi"
-));
-if(r.topic)text(item,"p","Objek / topik: "+r.topic);
-if(r.note)text(item,"p","Catatan: "+r.note,"caption");
-text(item,"p","Dicatat: "+new Date(r.time).toLocaleString("id-ID",{timeZone:"Asia/Jakarta"})+" WIB · Sumber: input manual");
-const del=text(item,"button","Hapus","delete");
-del.onclick=()=>{if(confirm("Hapus unggahan ini?"))persist(rows.filter(x=>x.id!==r.id))};
-$("list").appendChild(item);
-});
-}
-$("form").onsubmit=e=>{
-e.preventDefault();
-const u=new URL($("url").value.trim());
-const p=platform(u.hostname);
-if(!p||u.protocol!=="https:"){
-$("message").textContent="Gunakan URL HTTPS dari TikTok, Instagram, Facebook, atau X.";return;
-}
-u.hash="";
-const duplicate=rows.some(r=>r.url===u.href);
-if(duplicate){$("message").textContent="URL yang sama sudah tersimpan.";return}
-const number=id=>$(id).value===""?null:Number($(id).value);
-const row={
-id:crypto.randomUUID(),url
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIG SATINFORMATIKA • Free</title><style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#142136;--line:#2c3b53;--muted:#a3b6cf;--accent:#45dec0}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#eff5ff;font:14px system-ui}header{padding:25px 5%;background:linear-gradient(120deg,#15354c,#101b30);border-bottom:1px solid var(--line)}h1{font-size:25px;margin:8px 0}h2{font-size:18px;margin:0 0 15px}h3{font-size:15px}p{line-height:1.6;color:var(--muted)}main{max-width:1300px;margin:auto;padding:22px}.tag{letter-spacing:2px;color:var(--accent);font-size:11px}.grid{display:grid;gap:15px}.stats{grid-template-columns:repeat(4,1fr)}.charts{grid-template-columns:1fr 1fr;margin:18px 0}.card,section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px}.card strong{display:block;font-size:29px;margin:10px 0}.card small{color:var(--muted)}.layout{grid-template-columns:355px 1fr;margin-top:18px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:9px;background:#0c1728;color:#eef5ff;padding:11px;font:inherit}textarea{min-height:150px;resize:vertical}label{display:block;color:var(--muted);font-size:12px;margin:13px 0 6px}button,.button{border:0;border-radius:8px;padding:11px 14px;background:var(--accent);color:#072d28;font-weight:700;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.secondary{background:#2b405b;color:white}.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}.tools>*{flex:1;min-width:100px}.note{background:#193347;color:#c0dcec;padding:12px;border-radius:9px;font-size:12px;line-height:1.6}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:18px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.item p{white-space:pre-wrap}.badge{display:inline-block;background:#254252;color:#9ae9d8;padding:5px 8px;border-radius:6px;font-size:11px}a{color:#82cfff}.barrow{display:grid;grid-template-columns:80px 1fr 70px;gap:8px;align-items:center;margin:13px 0;font-size:12px}.track{height:11px;background:#25354b;border-radius:8px;overflow:hidden}.bar{height:100%;background:var(--accent);border-radius:8px}.empty{color:var(--muted)}#queue{font-size:12px;max-height:220px;overflow:auto}#message{color:var(--accent);white-space:pre-wrap}summary{cursor:pointer;font-weight:700;padding:8px 0}.danger{background:#543141;color:#ffc3cd}svg{width:100%;height:180px}.tiny{font-size:11px;color:var(--muted)}footer{text-align:center;padding:25px;color:var(--muted)}@media(max-width:850px){.layout,.charts{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}main{padding:13px}}@media print{ :root{color-scheme:light}body,header,section,.card{background:white!important;color:black!important}.entry,.tools,.no-print,#message,#queue{display:none!important}p,small,.tiny{color:#333!important}.layout{display:block}.charts,.stats{grid-template-columns:1fr 1fr}.item,.card,section{break-inside:avoid;border-color:#bbb}.badge{color:#222;background:#eee}a{color:#222}svg text{fill:#222}svg path{stroke:#168b79}.bar{background:#168b79!important}footer{color:black}}
+</style></head><body><header><span class="tag">SOCIAL INTELLIGENCE · FREE EDITION</span><h1>SIG SATINFORMATIKA</h1><p>30 URL sekali kirim · Grafik monitoring · Rekap periode · Laporan</p></header><main>
+<div class="tools"><select id="period" aria-label="Periode"><option value="all">Semua waktu</option><option value="today">Hari ini</option><option value="week">Minggu ini · Senin–Minggu</option><option value="month">Bulan ini</option><option value="quarter">Triwulan ini</option><option value="semester">Semester ini</option><option value="year">Tahun ini</option><option value="custom">Tanggal sendiri</option></select><select id="basis" aria-label="Dasar tanggal"><option value="time">Tanggal pengambilan</option><option value="published">Tanggal publikasi</option></select><select id="filter" aria-label="Platform"><option value="all">Semua platform</option><option>TikTok</option><option>Instagram</option><option>Facebook</option><option>X</option></select><button id="print">Cetak / PDF</button></div>
+<div id="custom" class="pair no-print" hidden><input type="date" id="from" aria-label="Dari tanggal"><input type="date" id="to" aria-label="Sampai tanggal"></div><p id="scope"></p>
+<div class="grid stats"><div class="card"><small>Unggahan unik · periode</small><strong id="total">0</strong><small id="overall"></small></div><div class="card"><small>Views diketahui</small><strong id="views">—</strong><small id="coverage"></small></div><div class="card"><small>Interaksi teramati</small><strong id="interactions">—</strong><small>Likes + komentar + shares yang tersedia</small></div><div class="card"><small>Data lengkap</small><strong id="complete">0%</strong><small>Caption, views, likes, komentar, shares</small></div></div>
+<div class="grid charts"><section><h2>Distribusi platform</h2><div id="platformChart"></div></section><section><h2>Indikasi sentimen teks</h2><div id="sentimentChart"></div><p class="tiny">Aturan kata sederhana, bukan AI; perlu peninjauan analis. Negatif tidak berarti ancaman.</p></section><section><h2>Tren unggahan yang dipantau</h2><div id="trend"></div><p class="tiny">Jumlah unggahan unik per tanggal sesuai dasar tanggal yang dipilih.</p></section><section><h2>Peringkat views</h2><div id="ranking"></div><p class="tiny">Angka mentah lintas platform; bukan skor performa yang dinormalisasi.</p></section></div>
+<div class="grid layout"><section class="entry"><h2>Analisis URL massal</h2><p>Tempel sampai 30 URL unggahan publik, satu per baris.</p><textarea id="urls" placeholder="https://www.instagram.com/reel/.../&#10;https://vt.tiktok.com/.../" aria-label="Daftar URL"></textarea><label>Topik penilaian relevansi</label><input id="topic" placeholder="Contoh: pendidikan, kesehatan"><div class="tools"><button id="analyze">Analisis Semua</button></div><div id="queue" role="status"></div><p id="message" role="status"></p>
+<details><summary>Koneksi backend gratis</summary><div class="note">Pasang backend yang disertakan. Token Apify hanya di environment backend. Jangan tempel token Apify di halaman ini.</div><label>Alamat backend</label><input id="endpoint" type="url" placeholder="https://backend-anda.example"><label>Kunci akses backend</label><input id="access" type="password" autocomplete="off" placeholder="ACCESS_KEY, bukan token Apify"><div class="tools"><button id="connect">Periksa koneksi</button></div><p id="connection">Belum diperiksa</p></details>
+<details><summary>Impor hasil Apify / cadangan</summary><p>Tanpa backend, jalankan Actor di Apify lalu impor JSON hasil ekspornya. Analisis teks dan grafik dihitung di perangkat.</p><label>Platform untuk JSON Apify</label><select id="importPlatform"><option>Instagram</option><option>TikTok</option><option>Facebook</option><option>X</option></select><input id="import" type="file" accept=".json,application/json"><div class="tools"><button id="backup" class="secondary">Cadangan JSON</button><button id="csv" class="secondary">Ekspor CSV</button></div></details>
+<details><summary>Kelola data</summary><p>Data berada di browser ini. Ekspor cadangan untuk pindah perangkat. Reset menghapus data lokal seluruh periode.</p><button id="reset" class="danger">Reset seluruh data</button></details></section><section><h2>Hasil analisis & rekap</h2><div class="note">Pengambilan otomatis membutuhkan backend dan kredit Apify. Versi ini menganalisis caption dengan aturan lokal; tidak menganalisis video atau isi komentar. Rekap bukan jangkauan orang unik.</div><div id="list"></div></section></div></main><footer>SIG SATINFORMATIKA · Waktu Asia/Jakarta · Analisis berbasis data yang tersedia</footer>
+<script type="module">
+const $=id=>document.getElementById(id),KEY='sig-free-v2',fmt=n=>Number(n).toLocaleString('id-ID');
+let rows=[],busy=false;
+try{rows=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('sig-url-monitor-v1')||'[]');if(!Array.isArray(rows))rows=[]}catch{}
+$('endpoint').value=localStorage.getItem('sig-backend')||'';
+const text=(parent,tag,value,cls)=>{const e=document.createElement(tag);e.textContent=value;if(cls)e.className=cls;parent.append(e);return e};
+const day=t=>{const d=new Date(t);if(!t||!Number.isFinite(d.getTime()))return '';return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)};
+const num=(...a)=>{for(const v of a)if(v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))&&Number(v)>=0)return Number(v);return null};
+function canonical(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port)throw Error('Gunakan HTTPS');u.hash='';const h=u.hostname.replace(/^www\./,'');let p;if(h==='instagram.com'&&/^\/(p|reel|reels)\//.test(u.pathname))p='Instagram';if((h==='tiktok.com'||h.endsWith('.tiktok.com'))&&(/\/video\/\d+/.test(u.pathname)||['vt.tiktok.com','vm.tiktok.com'].includes(h)))p='TikTok';if(['facebook.com','m.facebook.com','fb.watch'].includes(h)&&(/\/posts\/|\/videos\/|\/reel\/|story_fbid=|\/share\//.test(u.href)||h==='fb.watch'||u.pathname==='/watch/'))p='Facebook';if(['x.com','twitter.com','mobile.twitter.com'].includes(h)&&/\/status\/\d+/.test(u.pathname))p='X';if(!p)throw Error('Gunakan tautan unggahan publik, bukan profil');if(p!=='Facebook')u.search='';u.hostname=h;return {url:u.href,platform:p}}
+function assess(r){const content=r.caption||'',tokens=content.toLowerCase().match(/[\p{L}\p{N}_]+/gu)||[];const words=new Set(tokens);const pos=['bagus','baik','sukses','berhasil','apresiasi','terima','kasih','membantu'];const neg=['buruk','gagal','kecewa','tolak','korupsi','rusak','krisis'];const a=pos.filter(w=>words.has(w)),b=neg.filter(w=>words.has(w));const sentiment=!content.trim()?'Tidak cukup data':a.length&&b.length?'Campuran':a.length?'Positif':b.length?'Negatif':'Tidak terklasifikasi';const terms=[...new Set((r.topic||'').toLowerCase().match(/[\p{L}\p{N}_]+/gu)||[])];const hits=terms.filter(w=>words.has(w));return {sentiment,evidence:[...a,...b],summary:content.trim()?content.slice(0,350)+(content.length>350?'…':''):'Isi unggahan belum diperoleh.',relevance:terms.length&&content.trim()?Math.round(hits.length/terms.length*100):null,hits,tags:[...new Set(content.match(/#[\p{L}\p{N}_]+/gu)||[])]}}
+function save(next){try{localStorage.setItem(KEY,JSON.stringify(next));rows=next;render()}catch{throw Error('Penyimpanan browser penuh atau dibatasi. Ekspor cadangan.')}}
+function merge(r){r={...r,id:r.id||crypto.randomUUID(),time:r.time||new Date().toISOString(),topic:r.topic??$('topic').value};for(const k of ['v','l','c','s'])r[k]=num(r[k]);const c=canonical(r.url);r.url=c.url;r.platform=c.platform;const i=rows.findIndex(x=>{try{return canonical(x.url).url===r.url}catch{return false}});const next=[...rows];if(i>=0){const old=next[i];r.snapshots=[...(old.snapshots||[{time:old.time,v:old.v,l:old.l,c:old.c,s:old.s}]),{time:r.time,v:r.v,l:r.l,c:r.c,s:r.s}];r.id=old.id;next[i]=r}else{r.snapshots=[{time:r.time,v:r.v,l:r.l,c:r.c,s:r.s}];next.push(r)}save(next)}
+function bounds(){const now=day(Date.now()),[y,m,d]=now.split('-').map(Number);let start='0000-01-01',end='9999-12-31';const date=(a,b,c)=>`${a}-${String(b).padStart(2,'0')}-${String(c).padStart(2,'0')}`;switch($('period').value){case 'today':start=end=now;break;case 'week':{const x=new Date(Date.UTC(y,m-1,d));x.setUTCDate(x.getUTCDate()-(x.getUTCDay()+6)%7);start=x.toISOString().slice(0,10);x.setUTCDate(x.getUTCDate()+6);end=x.toISOString().slice(0,10);break}case 'month':start=date(y,m,1);end=new Date(Date.UTC(y,m,0)).toISOString().slice(0,10);break;case 'quarter':{const q=Math.floor((m-1)/3)*3+1;start=date(y,q,1);end=new Date(Date.UTC(y,q+2,0)).toISOString().slice(0,10);break}case 'semester':{const q=m<=6?1:7;start=date(y,q,1);end=date(y,q===1?6:12,q===1?30:31);break}case 'year':start=date(y,1,1);end=date(y,12,31);break;case 'custom':start=$('from').value||'0000-01-01';end=$('to').value||'9999-12-31'}return [start,end]}
+function filtered(){const [a,b]=bounds();return rows.filter(r=>{const d=day(r[$('basis').value]);return d&&d>=a&&d<=b&&($('filter').value==='all'||r.platform===$('filter').value)})}
+function bars(id,entries){const root=$(id);root.replaceChildren();const max=Math.max(1,...entries.map(e=>e[1]));for(const [k,v]of entries){const row=document.createElement('div');row.className='barrow';text(row,'span',k);const track=document.createElement('div');track.className='track';const bar=document.createElement('div');bar.className='bar';bar.style.width=(v/max*100)+'%';track.append(bar);row.append(track);text(row,'span',fmt(v));root.append(row)}if(!entries.length)text(root,'p','Belum ada data.','empty')}
+function trend(data){$('trend').replaceChildren();const dates={};data.forEach(r=>{const d=day(r[$('basis').value]);dates[d]=(dates[d]||0)+1});const points=Object.entries(dates).sort((a,b)=>a[0].localeCompare(b[0]));if(!points.length){text($('trend'),'p','Belum ada data.');return}const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 500 180');svg.setAttribute('role','img');svg.setAttribute('aria-label','Tren unggahan per tanggal');const max=Math.max(...points.map(x=>x[1]));const x=i=>30+i*440/Math.max(1,points.length-1),y=v=>145-v/max*110;const path=document.createElementNS(ns,'path');path.setAttribute('d',points.map((p,i)=>(i?'L':'M')+x(i)+' '+y(p[1])).join(' '));path.setAttribute('fill','none');path.setAttribute('stroke','#45dec0');path.setAttribute('stroke-width','3');svg.append(path);points.forEach((p,i)=>{const c=document.createElementNS(ns,'circle');c.setAttribute('cx',x(i));c.setAttribute('cy',y(p[1]));c.setAttribute('r','4');c.setAttribute('fill','#45dec0');const title=document.createElementNS(ns,'title');title.textContent=p[0]+': '+p[1]+' unggahan';c.append(title);svg.append(c)});for(const [label,xx]of [[points[0][0],10],[points.at(-1)[0],385]]){const t=document.createElementNS(ns,'text');t.setAttribute('x',xx);t.setAttribute('y',175);t.setAttribute('fill','#a3b6cf');t.setAttribute('font-size','11');t.textContent=label;svg.append(t)}$('trend').append(svg)}
+function render(){const data=filtered(),views=data.filter(r=>r.v!==null),ints=data.flatMap(r=>[r.l,r.c,r.s]).filter(n=>n!==null&&n!==undefined);$('total').textContent=fmt(data.length);$('overall').textContent='Total seluruh waktu: '+fmt(rows.length);$('views').textContent=views.length?fmt(views.reduce((a,r)=>a+r.v,0)):'—';$('coverage').textContent=`Tersedia pada ${views.length}/${data.length} unggahan`;$('interactions').textContent=ints.length?fmt(ints.reduce((a,b)=>a+b,0)):'—';$('complete').textContent=(data.length?Math.round(data.filter(r=>r.caption&&[r.v,r.l,r.c,r.s].every(n=>n!==null)).length/data.length*100):0)+'%';$('scope').textContent=$('period').selectedOptions[0].text+' • '+$('basis').selectedOptions[0].text+' • WIB • Angka snapshot terakhir per unggahan';bars('platformChart',['TikTok','Instagram','Facebook','X'].map(p=>[p,data.filter(r=>r.platform===p).length]));const counts={};data.forEach(r=>{const s=assess(r).sentiment;counts[s]=(counts[s]||0)+1});bars('sentimentChart',Object.entries(counts));bars('ranking',views.sort((a,b)=>b.v-a.v).slice(0,5).map(r=>[(r.account||r.platform).slice(0,15),r.v]));trend(data);$('list').replaceChildren();if(!data.length)text($('list'),'p','Belum ada hasil pada periode ini.');data.slice().sort((a,b)=>b.time.localeCompare(a.time)).forEach(r=>{const a=assess(r),e=document.createElement('article');e.className='item';text(e,'span',r.platform+' · '+(r.source||'Input manual'),'badge');text(e,'h3',r.account||'Akun belum tersedia');try{const u=canonical(r.url).url;const link=text(e,'a',u);link.href=u;link.target='_blank';link.rel='noopener noreferrer'}catch{text(e,'p','URL tidak valid')}text(e,'p',a.summary);text(e,'p',['Views','Likes','Komentar','Shares'].map((k,i)=>k+': '+([r.v,r.l,r.c,r.s][i]===null?'—':fmt([r.v,r.l,r.c,r.s][i]))).join(' · '));const complete=[r.l,r.c,r.s].every(n=>n!==null);text(e,'p','Engagement/views: '+(complete&&r.v>0?((r.l+r.c+r.s)/r.v*100).toFixed(2)+'%':'Belum cukup data'));text(e,'p','Indikasi sentimen: '+a.sentiment+' · Bukti kata: '+(a.evidence.join(', ')||'Tidak ditemukan'));text(e,'p','Kecocokan kata topik: '+(a.relevance===null?'Belum dapat dinilai':a.relevance+'%')+' · '+(a.hits.join(', ')||'Tidak ada kata cocok'));if(a.tags.length)text(e,'p',a.tags.join(' '));const snaps=r.snapshots||[];if(snaps.length>1){const first=snaps.at(-2),last=snaps.at(-1);text(e,'p','Perubahan views dari snapshot sebelumnya: '+(last.v!==null&&first.v!==null?(last.v-first.v>=0?'+':'')+fmt(last.v-first.v):'Belum tersedia'))}text(e,'p','Diambil '+new Date(r.time).toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})+' WIB · Publikasi: '+(day(r.published)||'Belum tersedia'),'tiny');if(r.note)text(e,'p','Catatan analis: '+r.note);const b=text(e,'button','Hapus','danger no-print');b.onclick=()=>{if(confirm('Hapus unggahan ini beserta snapshot lokal?'))save(rows.filter(x=>x.id!==r.id))};$('list').append(e)})}
+async function request(path,body){const base=$('endpoint').value.trim().replace(/\/$/,'');if(base&&!base.startsWith('https://')&&!base.startsWith('http://localhost'))throw Error('Backend harus menggunakan HTTPS');const res=await fetch(base+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-Access-Key':$('access').value},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(30000)});const data=await res.json().catch(()=>({error:'Respons backend tidak valid'}));if(!res.ok)throw Error(data.error||'HTTP '+res.status);return data}
+$('connect').onclick=async()=>{try{const h=await request('/api/health');$('connection').textContent=h.configured?'Backend siap. Platform: '+h.platforms.join(', '):'Backend terhubung; APIFY_TOKEN belum dipasang';localStorage.setItem('sig-backend',$('endpoint').value)}catch(e){$('connection').textContent=e.message}};
+$('analyze').onclick=async()=>{if(busy)return;const lines=$('urls').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);if(!lines.length||lines.length>30){$('message').textContent='Isi 1 sampai 30 URL, satu per baris.';return}let inputs;try{inputs=[...new Map(lines.map(s=>{const r=canonical(s);return[r.url,r]})).values()]}catch(e){$('message').textContent=e.message;return}if(!$('access').value){$('message').textContent='Buka Koneksi backend gratis dan pasang koneksi dahulu. Jangan gunakan token Apify sebagai kunci halaman.';return}busy=true;$('analyze').disabled=true;$('queue').replaceChildren();$('message').textContent='Jangan tutup halaman saat pengambilan berlangsung.';let cursor=0,ok=0,failed=0;const labels=inputs.map(r=>text($('queue'),'p',r.platform+' · Menunggu · '+r.url));async function worker(){while(cursor<inputs.length){const i=cursor++,r=inputs[i];try{labels[i].textContent=r.platform+' · Memulai pengambilan';const {id}=await request('/api/start',{url:r.url});let result;for(let n=0;n<100;n++){await new Promise(x=>setTimeout(x,4000));const job=await request('/api/job/'+id);labels[i].textContent=r.platform+' · '+job.status+' · '+r.url;if(job.status==='Gagal')throw Error(job.error);if(job.status==='Selesai'){result=job.result;break}}if(!result)throw Error('Batas tunggu habis. Periksa Apify sebelum mencoba ulang.');merge({...result,topic:$('topic').value});ok++;labels[i].textContent=r.platform+' · Selesai'}catch(e){failed++;labels[i].textContent=r.platform+' · '+e.message}$('message').textContent=`${ok} selesai · ${failed} gagal · ${inputs.length-ok-failed} tersisa`}}try{await Promise.all([worker(),worker()])}finally{busy=false;$('analyze').disabled=false}};
+function download(name,data,type){const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+$('backup').onclick=()=>download('SIG-Free-Cadangan.json',JSON.stringify({version:2,rows},null,2),'application/json');
+$('csv').onclick=()=>{const escape=v=>'"'+String(v??'').replace(/^[=+@\-\t\r]/,"'$&").replaceAll('"','""')+'"';const cols=['platform','url','account','caption','v','l','c','s','published','time'];download('SIG-Rekap.csv','\uFEFF'+[cols,...filtered().map(r=>cols.map(c=>r[c]))].map(r=>r.map(escape).join(',')).join('\r\n'),'text/csv;charset=utf-8')};
+$('import').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;if(f.size>10000000)throw Error('Batas file 10 MB');const parsed=JSON.parse(await f.text());const items=Array.isArray(parsed)?parsed:parsed.rows;if(!Array.isArray(items)||items.length>5000)throw Error('JSON harus berupa array; maksimal 5.000 item');let count=0,rejected=0;for(const x of items){try{if(x.error)throw Error('Data error');const r=x.platform&&('v'in x)?x:{platform:$('importPlatform').value,url:x.webVideoUrl??x.url??x.postUrl??x.tweetUrl,caption:x.caption??x.text??x.fullText??'',account:x.ownerUsername??x.authorMeta?.name??x.author?.userName??x.user?.name??'',v:num(x.videoViewCount,x.videoPlayCount,x.playCount,x.viewCount,x.viewsCount,x.views),l:num(x.likesCount,x.diggCount,x.likeCount,x.likes),c:num(x.commentsCount,x.commentCount,x.replyCount,x.comments),s:num(x.shareCount,x.sharesCount,x.retweetCount,x.shares),published:x.timestamp??x.createTimeISO??x.createdAt??x.time??null,source:'Impor JSON Apify',time:new Date().toISOString()};merge(r);count++}catch{rejected++}}$('message').textContent=`Impor: ${count} berhasil, ${rejected} ditolak.`}catch(e){$('message').textContent=e.message}finally{e.target.value=''}};
+$('reset').onclick=()=>{if(!busy&&confirm('Hapus seluruh data lokal? Ekspor cadangan dahulu.'))try{localStorage.setItem(KEY,'[]');localStorage.removeItem('sig-url-monitor-v1');rows=[];render()}catch(e){$('message').textContent=e.message}};
+$('print').onclick=()=>window.print();for(const id of ['period','basis','filter','from','to'])$(id).onchange=()=>{$('custom').hidden=$('period').value!=='custom';render()};render();
+</script></body></html>
